@@ -1,10 +1,5 @@
 pipeline {
     agent any
-
-    triggers {
-        pollSCM('* * * * *')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -12,37 +7,34 @@ pipeline {
             }
         }
 
-        stage('Setup .NET') {
+        stage('Install .NET 6 SDK (if needed)') {
             steps {
-                sh 'wget https://dot.net/v1/dotnet-install.sh'
-                sh 'chmod +x dotnet-install.sh'
-                sh './dotnet-install.sh --channel 6.0 --install-dir $HOME/dotnet'
-                env.PATH = "${env.HOME}/dotnet:${env.PATH}"
+                sh '''
+                    if ! dotnet --list-sdks | grep -q 6.0; then
+                        wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+                        chmod +x dotnet-install.sh
+                        ./dotnet-install.sh --channel 6.0 --install-dir $DOTNET_ROOT
+                    fi
+                '''
             }
         }
 
-        stage('Restore') {
+        stage('Restore Dependencies') {
             steps {
-                sh '$HOME/dotnet/dotnet restore'
+                sh 'dotnet restore'
             }
         }
 
         stage('Build') {
             steps {
-                sh '$HOME/dotnet/dotnet build --no-restore --configuration Release'
+                sh 'dotnet build --configuration Release'
             }
         }
 
         stage('Test') {
             steps {
-                sh '$HOME/dotnet/dotnet test --no-build --verbosity normal'
+                sh 'dotnet test --no-build --configuration Release --verbosity normal'
             }
-        }
-    }
-
-    post {
-        always {
-            junit '**/TestResults/*.xml'
         }
     }
 }
