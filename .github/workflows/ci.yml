@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - feature
+      - feature/**
 
 jobs:
   build:
@@ -13,10 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET 6.0
+      - name: Setup .NET 7.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
 
       - name: Restore dependencies
         run: dotnet restore
