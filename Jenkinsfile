@@ -20,7 +20,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'dotnet restore'
+                bat 'dotnet restore'
             }
         }
 
@@ -31,7 +31,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'dotnet build --no-restore'
+                bat 'dotnet build --no-restore'
             }
         }
 
@@ -42,7 +42,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'dotnet test --no-build --verbosity normal'
+                bat 'dotnet test --no-build --verbosity normal'
             }
         }
     }
